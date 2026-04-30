@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>VIT Star Students – Tamil Nadu 2025</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --p:#4338ca;--p2:#6366f1;--p3:#a5b4fc;--pbg:#eef2ff;
+  --am:#f59e0b;--ambg:#fffbeb;--bl:#3b82f6;--pk:#ec4899;
+  --gn:#10b981;--rd:#ef4444;--bg:#f1f5f9;--sur:#ffffff;
+  --bdr:#e2e8f0;--tx:#0f172a;--tx2:#64748b;--tx3:#94a3b8;
+  --sh:rgba(67,56,202,.10);--bar:64px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--tx);-webkit-font-smoothing:antialiased;}
+
+/* ── BAR ── */
+#bar{
+  position:fixed;top:0;left:0;right:0;height:var(--bar);
+  background:#0f172a;
+  display:flex;align-items:center;gap:10px;padding:0 16px;z-index:900;
+  justify-content:space-between;
+  border-bottom:1px solid rgba(99,102,241,.25);
+  box-shadow:0 1px 0 rgba(99,102,241,.15),0 4px 24px rgba(0,0,0,.35);
+}
+#bar::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,#6366f1,#a78bfa,#38bdf8,#6366f1);
+  background-size:200% 100%;
+  animation:barshine 4s linear infinite;
+}
+@keyframes barshine{0%{background-position:0% 0%}100%{background-position:200% 0%}}
+
+/* logo */
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.logo-box{
+  width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,#6366f1 0%,#818cf8 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:.68rem;color:#fff;letter-spacing:.04em;
+  box-shadow:0 0 0 1px rgba(99,102,241,.4),0 4px 12px rgba(99,102,241,.35);
+}
+.logo-text{display:flex;flex-direction:column;line-height:1.2;}
+.logo-title{font-size:.88rem;font-weight:800;color:#f8fafc;letter-spacing:-.02em;white-space:nowrap;}
+.logo-sub{font-size:.6rem;font-weight:500;color:#94a3b8;white-space:nowrap;letter-spacing:.01em;}
+.bar-div{width:1px;height:24px;background:rgba(99,102,241,.3);flex-shrink:0;}
+
+/* ── SEARCH ── */
+/* #sw stretches to fill all space between logo and right cluster */
+#sw{position:relative;flex:1 1 0;min-width:0;width:0;margin:0 6px;}
+#gs{
+  display:block;
+  width:100%;
+  padding:8px 32px 8px 34px;
+  background:#ffffff !important;
+  border:1.5px solid rgba(99,102,241,.45);
+  border-radius:9px;
+  color:#0f172a !important;
+  -webkit-text-fill-color:#0f172a !important;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:14px;font-weight:500;
+  outline:none;
+  transition:border-color .18s,box-shadow .18s;
+  /* prevent iOS from overriding bg */
+  -webkit-appearance:none;
+  appearance:none;
+}
+#gs:focus{
+  background:#ffffff !important;
+  border-color:#6366f1;
+  box-shadow:0 0 0 3px rgba(99,102,241,.2);
+}
+#gs::placeholder{
+  color:#94a3b8 !important;
+  -webkit-text-fill-color:#94a3b8 !important;
+  opacity:1;
+}
+/* autofill override so Chrome/Safari don't inject blue bg */
+#gs:-webkit-autofill,
+#gs:-webkit-autofill:focus{
+  -webkit-box-shadow:0 0 0 100px #ffffff inset !important;
+  -webkit-text-fill-color:#0f172a !important;
+}
+.si{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:12px;color:#6366f1;pointer-events:none;z-index:2;}
+#gx{position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;border:none;color:#94a3b8;cursor:pointer;font-size:12px;display:none;padding:2px;line-height:1;z-index:2;}
+#gx.on{display:block;color:#6366f1;}
+
+/* dropdown — fixed to viewport on all sizes for reliability */
+#sd{
+  position:fixed;
+  top:calc(var(--bar) + 6px);
+  left:10px;right:10px;
+  background:#ffffff;
+  border:1.5px solid #e2e8f0;
+  border-radius:12px;
+  box-shadow:0 16px 48px rgba(0,0,0,.18);
+  max-height:340px;overflow-y:auto;z-index:2000;display:none;
+}
+#sd.on{display:block;}
+#sd::-webkit-scrollbar{width:3px;}
+#sd::-webkit-scrollbar-thumb{background:var(--p3);border-radius:2px;}
+.sd-hd{padding:8px 14px;font-size:.6rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.08em;background:#f8fafc;border-bottom:1px solid #e2e8f0;}
+.sd-r{display:flex;align-items:center;gap:9px;padding:11px 14px;cursor:pointer;border-bottom:1px solid #f1f5f9;transition:background .1s;}
+.sd-r:hover{background:#eef2ff;}
+.sd-r:last-child{border-bottom:none;}
+.sd-nm{font-size:.9rem;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#0f172a;}
+.sd-dk{font-size:.72rem;color:#64748b;white-space:nowrap;}
+.sd-g{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:700;flex-shrink:0;}
+.sd-gM{background:#dbeafe;color:#1d4ed8;}
+.sd-gF{background:#fce7f3;color:#9d174d;}
+.sd-none{padding:18px;text-align:center;color:#64748b;font-size:.85rem;}
+
+/* right cluster */
+.bar-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+#sts{display:flex;gap:5px;}
+.st{
+  background:#1e293b;border:1px solid rgba(99,102,241,.25);
+  border-radius:8px;padding:4px 10px;text-align:center;white-space:nowrap;
+}
+.st-n{font-size:.8rem;font-weight:800;color:#e2e8f0;}
+.st-l{font-size:.46rem;color:#64748b;text-transform:uppercase;letter-spacing:.06em;font-weight:600;}
+
+/* filter btn */
+#btn-f{
+  padding:7px 13px;
+  background:#1e293b;border:1.5px solid rgba(99,102,241,.35);
+  border-radius:9px;color:#c7d2fe;font-size:12px;font-weight:700;
+  cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;
+  display:flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;
+}
+#btn-f:hover,#btn-f.on{background:#312e81;border-color:#6366f1;color:#e0e7ff;}
+.fbd{background:#6366f1;color:#fff;border-radius:6px;font-size:.58rem;font-weight:700;padding:1px 6px;display:none;}
+.fbd.on{display:inline;}
+
+/* ── FILTER PANEL ── */
+#fp{position:fixed;top:var(--bar);left:0;right:0;z-index:800;background:var(--sur);border-bottom:1px solid var(--bdr);box-shadow:0 6px 24px rgba(67,56,202,.08);overflow:hidden;max-height:0;transition:max-height .25s cubic-bezier(.4,0,.2,1);}
+#fp-overlay{position:fixed;inset:0;z-index:799;display:none;}
+#fp-overlay.on{display:block;}
+#fp.open{max-height:220px;overflow-y:auto;}
+.fp-in{padding:12px 14px 14px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;overflow-y:auto;max-height:188px;position:relative;padding-right:90px;}
+.fp-g{display:flex;flex-direction:column;gap:5px;flex-shrink:0;min-width:0;}
+.fp-l{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx2);}
+.fp-c{display:flex;gap:4px;flex-wrap:wrap;}
+.fp-rst{position:absolute;top:12px;right:14px;padding:5px 12px;border-radius:16px;font-size:.72rem;font-weight:700;border:1.5px solid rgba(239,68,68,.3);color:var(--rd);background:rgba(239,68,68,.04);cursor:pointer;transition:all .12s;white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;gap:4px;}
+.fp-rst:hover{background:rgba(239,68,68,.1);border-color:var(--rd);}
+.chip{padding:4px 10px;border-radius:16px;font-size:.72rem;font-weight:600;border:1.5px solid var(--bdr);background:var(--bg);color:var(--tx2);cursor:pointer;transition:all .12s;white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif;}
+.chip:hover{border-color:var(--p);color:var(--p);}
+.chip.on{background:#0d9488;border-color:#0d9488;color:#fff;}
+.chip.gM.on{background:#0284c7;border-color:#0284c7;}
+.chip.gF.on{background:#db2777;border-color:#db2777;}
+
+/* ── MAP ── */
+#mw{position:fixed;top:var(--bar);left:0;right:0;bottom:0;z-index:1;transition:right .3s cubic-bezier(.4,0,.2,1);overflow:hidden;}
+#map{width:100%;height:100%;cursor:grab;}#map:active{cursor:grabbing;}
+.leaflet-container{background:#f0fdfa!important;}
+.leaflet-control-zoom{border:1px solid var(--bdr)!important;border-radius:10px!important;overflow:hidden!important;box-shadow:0 2px 10px var(--sh)!important;}
+.leaflet-control-zoom a{background:var(--sur)!important;color:var(--p)!important;border-bottom:1px solid var(--bdr)!important;font-weight:700!important;font-size:14px!important;line-height:26px!important;}
+.leaflet-control-zoom a:hover{background:var(--pbg)!important;}
+.leaflet-div-icon{background:none!important;border:none!important;overflow:visible!important;}
+.dtt{background:var(--sur)!important;border:1px solid var(--bdr)!important;border-radius:10px!important;padding:8px 12px!important;font-family:'Plus Jakarta Sans',sans-serif!important;color:var(--tx)!important;font-size:12px!important;box-shadow:0 6px 24px rgba(0,0,0,.1)!important;pointer-events:none!important;}
+.dtt strong{display:block;font-size:13px;font-weight:700;color:var(--p);margin-bottom:2px;}
+
+/* legend */
+#leg{position:absolute;bottom:16px;left:12px;z-index:500;background:rgba(255,255,255,.97);border:1px solid var(--bdr);border-radius:12px;padding:11px 13px;box-shadow:0 4px 20px rgba(67,56,202,.1);display:none;}
+#leg h4{font-size:.58rem;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+.lg{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.lg-s{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+.lg-l{font-size:.7rem;color:var(--tx2);font-weight:500;}
+
+/* loader */
+#ldr{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+.spin{width:36px;height:36px;border:2.5px solid var(--bdr);border-top-color:var(--p);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+#ldr p{font-size:12.5px;color:var(--tx2);font-weight:500;}
+
+/* ── PANEL ── */
+#panel{position:fixed;top:var(--bar);right:0;bottom:0;width:40%;min-width:320px;max-width:520px;background:var(--sur);border-left:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);z-index:600;box-shadow:-8px 0 40px rgba(67,56,202,.1);}
+#panel.open{transform:translateX(0);}
+#panel.open ~ #mw,body.panel-open #mw{right:40%;}
+.ph{padding:14px 16px 11px;flex-shrink:0;border-bottom:1px solid var(--bdr);background:linear-gradient(135deg,#1e1b4b 0%,#4338ca 100%);}
+.ph-row1{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.ph-dk{font-size:1.1rem;font-weight:800;color:#fff;line-height:1.2;}
+.ph-x{width:26px;height:26px;border-radius:7px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;}
+.ph-x:hover{background:rgba(255,255,255,.22);color:#fff;}
+.ph-row2{display:flex;gap:5px;flex-wrap:wrap;}
+.phs{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:3px 9px;font-size:.68rem;display:flex;align-items:center;gap:3px;}
+.phs-v{font-weight:800;font-size:.82rem;color:#fff;}
+.phs-l{color:rgba(255,255,255,.65);font-weight:500;}
+.pf{padding:9px 14px;border-bottom:1px solid var(--bdr);flex-shrink:0;}
+.pf-sr{position:relative;margin-bottom:7px;}
+.pf-in{width:100%;padding:6px 10px 6px 28px;background:var(--bg);border:1.5px solid var(--bdr);border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:500;color:var(--tx);outline:none;transition:all .15s;}
+.pf-in:focus{border-color:var(--p);background:#fff;}
+.pf-in::placeholder{color:var(--tx3);}
+.pf-si{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--tx3);pointer-events:none;}
+.pf-chips{display:flex;gap:4px;flex-wrap:wrap;}
+.pt{flex:1;overflow-y:auto;}
+.pt::-webkit-scrollbar{width:3px;}
+.pt::-webkit-scrollbar-thumb{background:var(--p3);border-radius:2px;}
+table.tb{width:100%;border-collapse:collapse;}
+table.tb thead th{position:sticky;top:0;z-index:5;background:var(--pbg);color:var(--p);font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;font-weight:700;padding:8px 10px;text-align:left;border-bottom:1.5px solid var(--bdr);white-space:nowrap;}
+table.tb td{padding:9px 10px;font-size:12.5px;border-bottom:1px solid var(--bg);vertical-align:middle;}
+table.tb tbody tr{cursor:pointer;transition:background .1s;}
+table.tb tbody tr:hover td{background:var(--pbg);}
+.td-n{font-weight:600;color:var(--tx);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.td-g{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;}
+.td-gM{background:#dbeafe;color:#1d4ed8;}
+.td-gF{background:#fce7f3;color:#9d174d;}
+.td-bt{font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:7px;background:var(--ambg);color:#92400e;border:1px solid rgba(245,158,11,.2);white-space:nowrap;}
+.td-br{font-size:.72rem;color:var(--tx2);font-weight:500;}
+.nores{padding:28px;text-align:center;color:var(--tx2);font-size:.82rem;}
+.pe{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:24px;text-align:center;}
+.pe-ic{font-size:2.2rem;opacity:.15;}
+.pe p{font-size:.82rem;color:var(--tx2);line-height:1.7;}
+
+/* ── MOBILE DRAWER ── */
+#mob{display:none;position:fixed;top:var(--bar);left:0;right:0;bottom:0;z-index:1100;background:var(--sur);flex-direction:column;overflow:hidden;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}
+#mob.on{transform:translateY(0);display:flex;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:767px){
+  :root{--bar:58px;}
+  #panel{display:none!important;}
+  #mob{display:flex;}
+  #sts{display:none;}
+  #bar{padding:0 10px;gap:8px;}
+  /* search fills ALL space between logo and filter btn on mobile */
+  #sw{flex:1 1 0;width:0;min-width:0;max-width:none !important;margin:0 4px;}
+  #gs{font-size:15px;}
+  .logo-sub{display:none;}
+  .bar-div{display:none;}
+  .logo-box{width:30px;height:30px;font-size:.62rem;}
+  .logo-title{font-size:.8rem;}
+  /* hide filter text label on very small, show icon only */
+  #btn-f .btn-label{display:none;}
+}
+@media(min-width:768px){
+  #mob{display:none!important;}
+  #sw{max-width:420px;}
+}
+@media(max-width:360px){
+  .logo-title{font-size:.7rem;}
+  .logo-box{width:28px;height:28px;}
+  #bar{gap:6px;padding:0 8px;}
+}
+</style>
+</head>
+<body>
+
+<div id="bar">
+  <div class="logo">
+    <div class="logo-box">VIT</div>
+    <div class="logo-text">
+      <span class="logo-title">VIT Star Students</span>
+      <span class="logo-sub">Tamil Nadu &middot; upto 2025</span>
+    </div>
+  </div>
+  <div class="bar-div"></div>
+  <div id="sw">
+    <span class="si">&#9906;</span>
+    <input id="gs" type="text" placeholder="Search student name&#8230;" oninput="onGS()" onkeydown="if(event.key==='Escape')clearGS()" autocomplete="off"/>
+    <button id="gx" onclick="clearGS()">&#10005;</button>
+    <div id="sd"></div>
+  </div>
+  <div class="bar-right">
+    <div id="sts">
+      <div class="st"><div class="st-n" id="st-t">0</div><div class="st-l">Total</div></div>
+      <div class="st"><div class="st-n" id="st-m">0</div><div class="st-l">Male</div></div>
+      <div class="st"><div class="st-n" id="st-f">0</div><div class="st-l">Female</div></div>
+    </div>
+    <button id="btn-f" onclick="toggleFP()">&#9881; <span class="btn-label">Filters </span><span class="fbd" id="fbd">0</span></button>
+  </div>
+</div>
+
+<div id="fp-overlay" onclick="closeFP()"></div>
+<div id="fp">
+  <div class="fp-in">
+    <button class="fp-rst" onclick="resetAll()">&#10005; Clear</button>
+    <div class="fp-g"><div class="fp-l">Batch</div><div class="fp-c" id="fc-b" style="flex-wrap:wrap;"></div></div>
+    <div class="fp-g">
+      <div class="fp-l">Gender</div>
+      <div class="fp-c">
+        <button class="chip gM" onclick="tgG(this,'M')">&#9794; Male</button>
+        <button class="chip gF" onclick="tgG(this,'F')">&#9792; Female</button>
+      </div>
+    </div>
+    <div class="fp-g"><div class="fp-l">Branch</div><div class="fp-c" id="fc-br" style="flex-wrap:wrap;"></div></div>
+  </div>
+</div>
+
+<div id="mw">
+  <div id="map"></div>
+  
+</div>
+
+<div id="ldr"><div class="spin"></div><p>Loading map&hellip;</p></div>
+
+<div id="panel">
+  <div class="pe" id="pe"><div class="pe-ic">&#128506;</div><p>Click any district<br>to explore students</p></div>
+  <div id="pcon" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
+    <div class="ph">
+      <div class="ph-row1"><div class="ph-dk" id="p-dk">&#8212;</div><button class="ph-x" onclick="closeP()">&#10005;</button></div>
+      <div class="ph-row2">
+        <div class="phs"><span class="phs-v" id="p-tot">0</span><span class="phs-l">Total</span></div>
+        <div class="phs"><span class="phs-v" id="p-sho">0</span><span class="phs-l">Showing</span></div>
+        <div class="phs"><span class="phs-v" id="p-m" style="color:#93c5fd;">0</span><span class="phs-l">M</span></div>
+        <div class="phs"><span class="phs-v" id="p-f" style="color:#f9a8d4;">0</span><span class="phs-l">F</span></div>
+        <div class="phs"><span class="phs-v" id="p-bt" style="color:#fde68a;">&#8212;</span><span class="phs-l">Batch</span></div>
+      </div>
+    </div>
+    <div class="pf">
+      <div class="pf-sr"><span class="pf-si">&#9906;</span><input class="pf-in" id="pin" type="text" placeholder="Search name or branch&hellip;" oninput="renderP()"/></div>
+      <div class="pf-chips" id="pch"></div>
+    </div>
+    <div class="pt">
+      <table class="tb"><thead><tr><th>#</th><th>Name</th><th>G</th><th>Batch</th><th>Branch</th></tr></thead><tbody id="ptb"></tbody></table>
+      <div class="nores" id="pnr" style="display:none;">No students match.</div>
+    </div>
+  </div>
+</div>
+
+<div id="mob" onclick="if(event.target===this)closeM()">
+  <div class="ph" style="flex-shrink:0;">
+    <div class="ph-row1"><div class="ph-dk" id="m-dk">&#8212;</div><button class="ph-x" onclick="closeM()">&#10005;</button></div>
+    <div class="ph-row2">
+      <div class="phs"><span class="phs-v" id="m-tot">0</span><span class="phs-l">Total</span></div>
+      <div class="phs"><span class="phs-v" id="m-sho">0</span><span class="phs-l">Showing</span></div>
+      <div class="phs"><span class="phs-v" id="m-m" style="color:#93c5fd;">0</span><span class="phs-l">M</span></div>
+      <div class="phs"><span class="phs-v" id="m-f" style="color:#f9a8d4;">0</span><span class="phs-l">F</span></div>
+    </div>
+  </div>
+  <div class="pf" style="flex-shrink:0;">
+    <div class="pf-sr"><span class="pf-si">&#9906;</span><input class="pf-in" id="min" type="text" placeholder="Search name or branch&hellip;" oninput="renderM()"/></div>
+    <div class="pf-chips" id="mch"></div>
+  </div>
+  <div class="pt" style="flex:1;overflow-y:auto;">
+    <table class="tb"><thead><tr><th>#</th><th>Name</th><th>G</th><th>Batch</th><th>Branch</th></tr></thead><tbody id="mtb"></tbody></table>
+    <div class="nores" id="mnr" style="display:none;">No students match.</div>
+  </div>
+</div>
+
+<!-- ── STUDENTS DATA ───────────────────── -->
+<script>
+  let STUDENTS = [];
+  var GITHUB_JSON_URL = "https://raw.githubusercontent.com/vit-stars/data/main/students.json";
+  fetch(GITHUB_JSON_URL)
+  .then(r => r.json())
+  .then(data => {
+    STUDENTS = data;
+    initApp(); // ✅ THIS IS THE FIX
+  })
+  .catch(err => console.error(err));
+</script>
+<script>
+var ALIAS={"Kallakuruchi":"Kallakuruchi","kallakuruchi":"Kallakuruchi","KALLAKURUCHI":"Kallakuruchi","Kallakurichi":"Kallakuruchi","kallakurichi":"Kallakuruchi","KALLAKURICHI":"Kallakuruchi","Kanyakumari":"Kanniyakumari","kanyakumari":"Kanniyakumari","KANYAKUMARI":"Kanniyakumari","kanniyakumari":"Kanniyakumari","Thoothukudi":"Tuticorin","thoothukudi":"Tuticorin","Tuticorin":"Tuticorin","tuticorin":"Tuticorin","THOOTHUKUDI":"Tuticorin","TUTICORIN":"Tuticorin","Tiruvallur":"Thiruvallur","tiruvallur":"Thiruvallur","TIRUVALLUR":"Thiruvallur","thiruvallur":"Thiruvallur","Tiruvarur":"Thiruvarur","tiruvarur":"Thiruvarur","TIRUVARUR":"Thiruvarur","thiruvarur":"Thiruvarur","Viluppuram":"Villupuram","viluppuram":"Villupuram","VILUPPURAM":"Villupuram","villupuram":"Villupuram","Kancheepuram":"Kanchipuram","kancheepuram":"Kanchipuram","KANCHEEPURAM":"Kanchipuram","kanchipuram":"Kanchipuram","KANCHIPURAM":"Kanchipuram","Tiruchirappalli":"Tiruchirappalli","tiruchirappalli":"Tiruchirappalli","TIRUCHIRAPPALLI":"Tiruchirappalli","trichy":"Tiruchirappalli","TRICHY":"Tiruchirappalli","Tirunelveli":"Tirunelveli","tirunelveli":"Tirunelveli","TIRUNELVELI":"Tirunelveli","Tiruvannamalai":"Tiruvannamalai","tiruvannamalai":"Tiruvannamalai","TIRUVANNAMALAI":"Tiruvannamalai","thiruvannamalai":"Tiruvannamalai","The Nilgiris":"The Nilgiris","the nilgiris":"The Nilgiris","nilgiris":"The Nilgiris","NILGIRIS":"The Nilgiris","Ariyalur":"Ariyalur","ariyalur":"Ariyalur","ARIYALUR":"Ariyalur","Chengalpattu":"Chengalpattu","chengalpattu":"Chengalpattu","CHENGALPATTU":"Chengalpattu","Chennai":"Chennai","chennai":"Chennai","CHENNAI":"Chennai","Coimbatore":"Coimbatore","coimbatore":"Coimbatore","COIMBATORE":"Coimbatore","Cuddalore":"Cuddalore","cuddalore":"Cuddalore","CUDDALORE":"Cuddalore","Dharmapuri":"Dharmapuri","dharmapuri":"Dharmapuri","DHARMAPURI":"Dharmapuri","Dindigul":"Dindigul","dindigul":"Dindigul","DINDIGUL":"Dindigul","Erode":"Erode","erode":"Erode","ERODE":"Erode","Karur":"Karur","karur":"Karur","KARUR":"Karur","Krishnagiri":"Krishnagiri","krishnagiri":"Krishnagiri","KRISHNAGIRI":"Krishnagiri","Madurai":"Madurai","madurai":"Madurai","MADURAI":"Madurai","Mayiladuthurai":"Mayiladuthurai","mayiladuthurai":"Mayiladuthurai","MAYILADUTHURAI":"Mayiladuthurai","mayavaram":"Mayiladuthurai","Nagapattinam":"Nagapattinam","nagapattinam":"Nagapattinam","NAGAPATTINAM":"Nagapattinam","Namakkal":"Namakkal","namakkal":"Namakkal","NAMAKKAL":"Namakkal","Perambalur":"Perambalur","perambalur":"Perambalur","PERAMBALUR":"Perambalur","Pudukkottai":"Pudukkottai","pudukkottai":"Pudukkottai","PUDUKKOTTAI":"Pudukkottai","Ramanathapuram":"Ramanathapuram","ramanathapuram":"Ramanathapuram","RAMANATHAPURAM":"Ramanathapuram","ramnad":"Ramanathapuram","Ranipet":"Ranipet","ranipet":"Ranipet","RANIPET":"Ranipet","Salem":"Salem","salem":"Salem","SALEM":"Salem","Sivaganga":"Sivaganga","sivaganga":"Sivaganga","SIVAGANGA":"Sivaganga","Tenkasi":"Tenkasi","tenkasi":"Tenkasi","TENKASI":"Tenkasi","Thanjavur":"Tanjore","thanjavur":"Thanjavur","THANJAVUR":"Thanjavur","Theni":"Theni","theni":"Theni","THENI":"Theni","Tirupathur":"Tirupathur","tirupathur":"Tirupathur","TIRUPATHUR":"Tirupathur","Tiruppathur":"Tirupathur","tiruppathur":"Tirupathur","TIRUPPATHUR":"Tirupathur","Tirupattur":"Tirupathur","tirupattur":"Tirupathur","TIRUPATTUR":"Tirupathur","Tiruppur":"Tirupur","tiruppur":"Tiruppur","TIRUPPUR":"Tiruppur","Vellore":"Vellore","vellore":"Vellore","VELLORE":"Vellore","Virudhunagar":"Virudhunagar","virudhunagar":"Virudhunagar","VIRUDHUNAGAR":"Virudhunagar"};
+var ALL38=["Ariyalur","Chengalpattu","Chennai","Coimbatore","Cuddalore","Dharmapuri","Dindigul","Erode","Kallakuruchi","Kanchipuram","Kanniyakumari","Karur","Krishnagiri","Madurai","Mayiladuthurai","Nagapattinam","Namakkal","Perambalur","Pudukkottai","Ramanathapuram","Ranipet","Salem","Sivaganga","Tenkasi","Thanjavur","The Nilgiris","Theni","Thiruvallur","Thiruvarur","Tiruchirappalli","Tirunelveli","Tirupathur","Tiruppur","Tiruvannamalai","Tuticorin","Vellore","Villupuram","Virudhunagar"];
+var SHORT={"Ramanathapuram":"Ramanath.","Tiruchirappalli":"Trichy","Tiruvannamalai":"T.Malai","Kanniyakumari":"Kanyakumari","Mayiladuthurai":"Mayi.","Nagapattinam":"Nagapat.","Kanchipuram":"Kanchee.","Krishnagiri":"Krishna.","Chengalpattu":"Chengal.","Kallakuruchi":"Kallakur.","Dharmapuri":"Dharmap.","Thiruvallur":"T.Vallur","Tuticorin":"Thootu.","Tirunelveli":"T.Nelveli","Tirupathur":"T.Pathur","Pudukkottai":"Pudukk.","Villupuram":"Viluppu.","Sivaganga":"Sivagan.","Thanjavur":"Thanjav.","The Nilgiris":"Nilgiris","Thiruvarur":"T.Varur","Virudhunagar":"Virudhu."};
+var RC={};
+function res(raw){if(!raw)return null;var r=String(raw).trim();if(RC[r]!==undefined)return RC[r];if(ALIAS[r]){RC[r]=ALIAS[r];return ALIAS[r];}var rl=r.toLowerCase();for(var k in ALIAS){if(k.toLowerCase()===rl){RC[r]=ALIAS[k];return ALIAS[k];}}for(var i=0;i<ALL38.length;i++){if(ALL38[i].toLowerCase()===rl){RC[r]=ALL38[i];return ALL38[i];}}var rn=rl.replace(/[^a-z]/g,"");for(var i=0;i<ALL38.length;i++){if(ALL38[i].toLowerCase().replace(/[^a-z]/g,"")===rn){RC[r]=ALL38[i];return ALL38[i];}}RC[r]=null;return null;}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+function nb(b){if(!b)return"";var s=String(b).trim();return(s.length===4&&s.startsWith("20"))?s.slice(2):s;}
+STUDENTS.forEach(function(s){s.batch=nb(s.batch);s.dk=res(s.district)||s.district;});
+var DM={};
+STUDENTS.forEach(function(s){if(!DM[s.dk])DM[s.dk]={total:0,m:0,f:0,ss:[]};DM[s.dk].total++;if(s.g==="M")DM[s.dk].m++;else DM[s.dk].f++;DM[s.dk].ss.push(s);});
+var fB=[],fG=[],fBr=[],fpO=false,cDk=null,pBF="all";
+function getF(){return STUDENTS.filter(function(s){return(!fB.length||fB.indexOf(s.batch)>=0)&&(!fG.length||fG.indexOf(s.g)>=0)&&(!fBr.length||fBr.indexOf(s.branch)>=0);});}
+function nA(){return fB.length+fG.length+fBr.length;}
+function updS(a){var m=a.filter(function(s){return s.g==="M";}).length,f=a.filter(function(s){return s.g==="F";}).length;document.getElementById("st-t").textContent=a.length;document.getElementById("st-m").textContent=m;document.getElementById("st-f").textContent=f;var n=nA(),b=document.getElementById("fbd");b.textContent=n;b.className="fbd"+(n>0?" on":"");}
+var allB=[],allBr=[];
+STUDENTS.forEach(function(s){if(s.batch&&allB.indexOf(s.batch)<0)allB.push(s.batch);if(s.branch&&allBr.indexOf(s.branch)<0)allBr.push(s.branch);});
+allB.sort();allBr.sort();
+allB.forEach(function(b){var btn=document.createElement("button");btn.className="chip";btn.textContent="20"+b;btn.onclick=function(){var i=fB.indexOf(b);if(i<0){fB.push(b);btn.classList.add("on");}else{fB.splice(i,1);btn.classList.remove("on");}applyF();};document.getElementById("fc-b").appendChild(btn);});
+allBr.forEach(function(b){var btn=document.createElement("button");btn.className="chip";btn.textContent=b;btn.onclick=function(){var i=fBr.indexOf(b);if(i<0){fBr.push(b);btn.classList.add("on");}else{fBr.splice(i,1);btn.classList.remove("on");}applyF();};document.getElementById("fc-br").appendChild(btn);});
+function tgG(btn,g){var i=fG.indexOf(g);if(i<0){fG.push(g);btn.classList.add("on");}else{fG.splice(i,1);btn.classList.remove("on");}applyF();}
+function applyF(){var a=getF();updS(a);refreshMap();refreshLegend();if(cDk){if(window.innerWidth>=768)renderP();else renderM();}}
+function resetAll(){fB=[];fG=[];fBr=[];document.querySelectorAll(".chip").forEach(function(c){c.classList.remove("on");});document.getElementById("gs").value="";document.getElementById("gx").className="";document.getElementById("sd").className="";applyF();}
+function toggleFP(){fpO=!fpO;document.getElementById("fp").classList.toggle("open",fpO);document.getElementById("fp-overlay").className=fpO?"on":"";}
+function closeFP(){fpO=false;document.getElementById("fp").classList.remove("open");document.getElementById("fp-overlay").className="";}
+updS(STUDENTS);
+function onGS(){var q=document.getElementById("gs").value.trim();document.getElementById("gx").className=q.length>0?"on":"";var dr=document.getElementById("sd");if(q.length<2){dr.className="";return;}var ql=q.toLowerCase();var hits=STUDENTS.filter(function(s){return s.name.toLowerCase().indexOf(ql)>=0||s.dk.toLowerCase().indexOf(ql)>=0;}).slice(0,10);if(!hits.length){dr.innerHTML='<div class="sd-none">No results.</div>';dr.className="on";return;}var html='<div class="sd-hd">'+hits.length+' result'+(hits.length>1?'s':'')+'</div>';hits.forEach(function(s){html+='<div class="sd-r" onclick="openFrom(\''+esc(s.dk)+'\')"><span class="sd-g sd-g'+esc(s.g)+'">'+esc(s.g)+'</span><span class="sd-nm">'+esc(s.name)+'</span><span class="sd-dk">&#128205; '+esc(s.dk)+'</span></div>';});dr.innerHTML=html;dr.className="on";}
+function clearGS(){document.getElementById("gs").value="";document.getElementById("gx").className="";document.getElementById("sd").className="";}
+function openFrom(d){clearGS();openD(d);}
+document.addEventListener("click",function(e){if(!e.target.closest("#sw"))document.getElementById("sd").className="";});
+function openD(dk){cDk=dk;pBF="all";if(window.innerWidth>=768)openP(dk);else openM(dk);}
+function openP(dk){fillH(dk,"p");buildCh(document.getElementById("pch"),"p");document.getElementById("pin").value="";document.getElementById("pe").style.display="none";document.getElementById("pcon").style.display="flex";document.getElementById("panel").classList.add("open");document.body.classList.add("panel-open");setTimeout(function(){if(map){map.invalidateSize({animate:false});map.dragging.enable();}},340);renderP();}
+function closeP(){document.getElementById("panel").classList.remove("open");document.body.classList.remove("panel-open");setTimeout(function(){if(map){map.invalidateSize({animate:false});map.dragging.enable();}document.getElementById("pcon").style.display="none";document.getElementById("pe").style.display="flex";cDk=null;},340);}
+function openM(dk){fillH(dk,"m");buildCh(document.getElementById("mch"),"m");document.getElementById("min").value="";document.getElementById("mob").classList.add("on");renderM();}
+function closeM(){document.getElementById("mob").classList.remove("on");cDk=null;}
+function fillH(dk,px){var info=DM[dk]||{total:0,m:0,f:0,ss:[]};var arr=getF().filter(function(s){return s.dk===dk;});document.getElementById(px+"-dk").textContent=dk;document.getElementById(px+"-tot").textContent=info.total;document.getElementById(px+"-sho").textContent=arr.length;document.getElementById(px+"-m").textContent=info.m;document.getElementById(px+"-f").textContent=info.f;if(px==="p"){var bts=getBts(info.ss);document.getElementById("p-bt").textContent=bts.map(function(b){return"20"+b;}).join(", ")||"--";}}
+function getBts(ss){var b=[],s={};ss.forEach(function(x){if(x.batch&&!s[x.batch]){s[x.batch]=1;b.push(x.batch);}});return b.sort();}
+function buildCh(c,px){pBF="all";c.innerHTML="";var mk=function(lbl,val){var btn=document.createElement("button");btn.className="chip"+(val==="all"?" on":"");btn.textContent=lbl;btn.onclick=function(){pBF=val;c.querySelectorAll(".chip").forEach(function(x){x.classList.remove("on");});btn.classList.add("on");if(px==="p")renderP();else renderM();};c.appendChild(btn);};mk("All","all");mk("Male","M");mk("Female","F");if(cDk){var inf=DM[cDk];if(inf)getBts(inf.ss).forEach(function(b){mk("20"+b,b);});}}
+function getRows(sid){if(!cDk)return[];var q=(document.getElementById(sid).value||"").toLowerCase();var rows=getF().filter(function(s){return s.dk===cDk;});if(pBF==="M")rows=rows.filter(function(s){return s.g==="M";});else if(pBF==="F")rows=rows.filter(function(s){return s.g==="F";});else if(pBF!=="all")rows=rows.filter(function(s){return s.batch===pBF;});if(q)rows=rows.filter(function(s){return s.name.toLowerCase().indexOf(q)>=0||(s.branch||"").toLowerCase().indexOf(q)>=0;});return rows;}
+function buildTbl(rows,tbId,nrId,shoId){document.getElementById(shoId).textContent=rows.length;var tb=document.getElementById(tbId),nr=document.getElementById(nrId);if(!rows.length){tb.innerHTML="";nr.style.display="block";return;}nr.style.display="none";var html="";rows.forEach(function(s,i){html+='<tr><td style="font-size:.65rem;color:var(--tx3);font-weight:600;">'+(i+1)+'</td><td class="td-n" title="'+esc(s.name)+'">'+esc(s.name)+'</td><td><span class="td-g td-g'+esc(s.g)+'">'+esc(s.g)+'</span></td><td><span class="td-bt">20'+esc(s.batch)+'</span></td><td class="td-br">'+esc(s.branch)+'</td></tr>';});tb.innerHTML=html;}
+function renderP(){if(!cDk||window.innerWidth<768)return;buildTbl(getRows("pin"),"ptb","pnr","p-sho");}
+function renderM(){if(!cDk||window.innerWidth>=768)return;buildTbl(getRows("min"),"mtb","mnr","m-sho");}
+var REGION={"Chennai":"N","Thiruvallur":"N","Vellore":"N","Ranipet":"N","Kanchipuram":"N","Chengalpattu":"N","Tiruvannamalai":"N","Tirupathur":"N","Villupuram":"N","Kallakuruchi":"N","Cuddalore":"N","Krishnagiri":"W","Dharmapuri":"W","Salem":"W","Namakkal":"W","Erode":"W","Tirupur":"W","Coimbatore":"W","The Nilgiris":"W","Karur":"W","Dindigul":"W","Perambalur":"C","Ariyalur":"C","Tiruchirappalli":"C","Tanjore":"C","Thiruvarur":"C","Nagapattinam":"C","Mayiladuthurai":"C","Pudukkottai":"C","Sivaganga":"C","Madurai":"S","Theni":"S","Virudhunagar":"S","Ramanathapuram":"S","Tenkasi":"S","Tirunelveli":"S","Tuticorin":"S","Kanniyakumari":"S"};
+var RCLR={"N":"#f4a261","W":"#4a90d9","C":"#f5c518","S":"#e63946"};
+function getClr(n,k){var r=REGION[k]||"N";if(!n||n===0)return"#f1f5f9";return RCLR[r];}
+function lblClr(fill){return(fill==="#4338ca"||fill==="#1e1b4b"||fill==="#818cf8")?"#ffffff":"#1e1b4b";}
+var map=L.map("map",{center:[10.85,78.7],zoom:window.innerWidth<=767?6:7,scrollWheelZoom:false,touchZoom:true,tap:false,dragging:true,boxZoom:true,zoomControl:true,attributionControl:false,zoomSnap:0.05,zoomDelta:0.05,wheelPxPerZoomLevel:120});
+map.zoomControl.setPosition("topright");
+L.rectangle([[-90,-180],[90,180]],{color:"none",fillColor:"#f0fdfa",fillOpacity:1,interactive:false}).addTo(map);
+var isMobile=window.innerWidth<=767;
+var gjL=null,lbls=[];
+function initApp() {
+  // process students
+  STUDENTS.forEach(function(s){
+    s.batch = nb(s.batch);
+    s.dk = res(s.district) || s.district;
+  });
+
+  // build district map
+  DM = {};
+  STUDENTS.forEach(function(s){
+    if(!DM[s.dk]) DM[s.dk] = {total:0,m:0,f:0,ss:[]};
+    DM[s.dk].total++;
+    if(s.g === "M") DM[s.dk].m++;
+    else DM[s.dk].f++;
+    DM[s.dk].ss.push(s);
+  });
+
+  // build filters
+  allB = [];
+  allBr = [];
+
+  STUDENTS.forEach(function(s){
+    if(s.batch && allB.indexOf(s.batch) < 0) allB.push(s.batch);
+    if(s.branch && allBr.indexOf(s.branch) < 0) allBr.push(s.branch);
+  });
+
+  allB.sort();
+  allBr.sort();
+
+  // rebuild UI
+  updS(STUDENTS);
+  refreshMap();
+}
+function fSty(f){var k=f.properties.dtname||"";var arr=getF();var cnt=arr.filter(function(s){return s.dk===k;}).length;var tot=DM[k]?DM[k].total:0;var hf=nA()>0;if(hf){var fc;if(cnt===0)fc="#f3f4f6";else if(cnt<=3)fc="#99f6e4";else if(cnt<=8)fc="#2dd4bf";else if(cnt<=20)fc="#0d9488";else fc="#134e4a";var bc=cnt===0?"#d1d5db":"#0d9488";var bw=cnt===0?1:2;return{fillColor:fc,fillOpacity:cnt===0?0.5:0.88,color:bc,weight:bw,opacity:1};}var fill=getClr(tot,k);return{fillColor:fill,fillOpacity:(tot>0?0.82:0.18),color:"#ffffff",weight:1.5,opacity:1};}
+function refreshMap(){if(gjL)gjL.setStyle(fSty);lbls.forEach(function(m){var k=m._dk;var arr=getF();var cnt=arr.filter(function(s){return s.dk===k;}).length;var tot=DM[k]?DM[k].total:0;m.setIcon(mkLbl(k,cnt,tot));});}
+function refreshLegend(){var active=nA()>0;document.getElementById("leg-region").style.display=active?"none":"block";document.getElementById("leg-filter").style.display=active?"block":"none";}
+function mkLbl(k,cnt,tot){var hf=nA()>0;var dm=hf&&(getF().filter(function(s){return s.dk===k;}).length===0);var short=SHORT[k]||k;var tc=dm?"#94a3b8":"#0f172a";var sh="-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,1px 1px 0 #fff";return L.divIcon({className:"",html:'<span style="font-family:\'Plus Jakarta Sans\',sans-serif;font-size:9.5px;font-weight:700;color:'+tc+';text-shadow:'+sh+';white-space:nowrap;pointer-events:none;line-height:1.3;">'+esc(short)+'</span>',iconSize:[70,14],iconAnchor:[35,7]});}
+function onEach(f,layer){var k=f.properties.dtname||"";layer.on({mouseover:function(e){var rk=f&&f.properties?REGION[f.properties.dtname||""]:"N";e.target.setStyle({weight:3,color:nA()>0?"#0d9488":(RCLR[rk]||"#4338ca"),fillOpacity:1});e.target.bringToFront();},mouseout:function(e){if(gjL)gjL.resetStyle(e.target);},click:function(){if(k)openD(k);}});var info=DM[k];layer.bindTooltip('<div><strong>'+esc(k)+'</strong><br><span style="color:#4338ca;font-weight:600;">'+(info?info.total:0)+' students</span>'+(info?' <span style="color:#3b82f6;font-size:.9em;">&#9794;'+info.m+'</span> <span style="color:#ec4899;font-size:.9em;">&#9792;'+info.f+'</span>':"")+'</div>',{sticky:true,opacity:1,className:"dtt"});}
+function remapGJ(gj){gj.features.forEach(function(f){var p=f.properties;var raw=p.dtname||p.district_n||p.DISTRICT||p.Dist_Name||p.NAME_2||p.name||"";f.properties.dtname=res(raw)||raw;});var found=gj.features.map(function(f){return f.properties.dtname;}).sort();console.log("GeoJSON districts:",found.join(", "));}
+function initMap(gj){remapGJ(gj);gjL=L.geoJSON(gj,{style:fSty,onEachFeature:onEach}).addTo(map);map.fitBounds(gjL.getBounds(),{padding:[8,8]});gj.features.forEach(function(f){var k=f.properties.dtname||'';if(!k)return;try{var c=L.geoJSON(f).getBounds().getCenter();var tot=DM[k]?DM[k].total:0;var m=L.marker(c,{interactive:false,icon:mkLbl(k,tot,tot)}).addTo(map);m._dk=k;lbls.push(m);}catch(e){}});document.getElementById("ldr").style.display="none";document.getElementById("leg").style.display="block";refreshLegend();map.dragging.enable();}
+var CDN="https://cdn.jsdelivr.net/gh/datta07/INDIAN-SHAPEFILES@master/STATES/TAMIL%20NADU/TAMIL%20NADU_DISTRICTS.geojson";
+var RAW="https://raw.githubusercontent.com/datta07/INDIAN-SHAPEFILES/master/STATES/TAMIL%20NADU/TAMIL%20NADU_DISTRICTS.geojson";
+fetch(CDN).then(function(r){if(!r.ok)throw 0;return r.json();}).then(initMap).catch(function(){fetch(RAW).then(function(r){return r.json();}).then(initMap).catch(function(){document.getElementById("ldr").innerHTML='<div style="color:var(--rd);font-size:13px;text-align:center;padding:20px;">&#9888; Could not load map. Check internet and reload.</div>';});});
+</script>
+</body>
+</html>
