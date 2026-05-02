@@ -1116,10 +1116,15 @@ fetch(CDN).then(function(r){if(!r.ok)throw 0;return r.json();}).then(initMap)
     .catch(function(){document.getElementById("ldr").innerHTML='<p style="color:#ef4444;padding:20px;">⚠ Map failed to load.</p>';});});
 
 /* ── FETCH STUDENTS (after full page load) ── */
-var GITHUB_JSON_URL="https://raw.githubusercontent.com/vit-stars/data/main/students.json";
+var GITHUB_JSON_URL="https://api.github.com/repos/vit-stars/private-data-repo/contents/students.json";
 window.addEventListener("load",function(){
   document.getElementById("ldr-msg").textContent="Loading student data…";
-  fetch(GITHUB_JSON_URL)
+  fetch(GITHUB_JSON_URL, {
+  headers: {
+    Authorization: "Bearer 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",
+    Accept: "application/vnd.github.v3.raw"
+  }
+})
     .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
     .then(function(data){STUDENTS=Array.isArray(data)?data:[];initApp();})
     .catch(function(err){console.error(err);STUDENTS=[];initApp();});
